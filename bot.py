@@ -1,6 +1,7 @@
 import os
 import discord
 from discord.ext import commands
+from datetime import timedelta
 
 intents = discord.Intents.default()
 intents.members = True
@@ -12,17 +13,33 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
+# TIMEOUT COMMAND
 @bot.command()
-@commands.has_permissions(manage_roles=True)
-async def giverole(ctx, member: discord.Member, *, role: discord.Role):
-    await member.add_roles(role)
-    await ctx.send(f"Gave {role} to {member.mention}")
+@commands.has_permissions(moderate_members=True)
+async def timeout(ctx, member: discord.Member, minutes: int):
 
+    duration = timedelta(minutes=minutes)
+
+    await member.edit(
+        timed_out_until=discord.utils.utcnow() + duration
+    )
+
+    await ctx.send(
+        f"{member.mention} has been timed out for {minutes} minutes."
+    )
+
+# REMOVE TIMEOUT
 @bot.command()
-@commands.has_permissions(manage_roles=True)
-async def removerole(ctx, member: discord.Member, *, role: discord.Role):
-    await member.remove_roles(role)
-    await ctx.send(f"Removed {role} from {member.mention}")
+@commands.has_permissions(moderate_members=True)
+async def untimeout(ctx, member: discord.Member):
+
+    await member.edit(
+        timed_out_until=None
+    )
+
+    await ctx.send(
+        f"Removed timeout from {member.mention}"
+    )
 
 TOKEN = os.getenv("TOKEN")
 
