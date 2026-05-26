@@ -1,7 +1,6 @@
 import os
 import discord
 from discord.ext import commands
-from datetime import timedelta
 
 intents = discord.Intents.default()
 intents.members = True
@@ -24,26 +23,6 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 async def removerole(ctx, member: discord.Member, *, role: discord.Role):
     await member.remove_roles(role)
     await ctx.send(f"Removed {role} from {member.mention}")
-
-@bot.command()
-@commands.has_permissions(moderate_members=True)
-async def timeout(ctx, member: discord.Member, minutes: int, *, reason=None):
-    duration = timedelta(minutes=minutes)
-
-    await member.timeout(duration, reason=reason)
-
-    await ctx.send(
-        f"{member.mention} was timed out for {minutes} minutes."
-    )
-
-@bot.command()
-@commands.has_permissions(moderate_members=True)
-async def untimeout(ctx, member: discord.Member):
-    await member.timeout(None)
-
-    await ctx.send(
-        f"Removed timeout from {member.mention}"
-    )
 
 TOKEN = os.getenv("TOKEN")
 
