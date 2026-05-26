@@ -53,12 +53,15 @@ async def timeout(
         elif unit == "m":
             delta = timedelta(minutes=amount)
 
+        elif unit == "h":
+            delta = timedelta(hours=amount)
+
         elif unit == "d":
             delta = timedelta(days=amount)
 
         else:
             await ctx.send(
-                "Use s (seconds), m (minutes), or d (days)."
+                "Use s (seconds), m (minutes), h (hours), or d (days)."
             )
             return
 
@@ -74,7 +77,7 @@ async def timeout(
 
     except:
         await ctx.send(
-            "Invalid format. Example: .to @user 10m spamming"
+            "Invalid format. Example: .to @user 5h spamming"
         )
 
 @bot.command(name="um")
