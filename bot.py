@@ -35,7 +35,13 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
 
 @bot.command(name="to")
 @commands.has_permissions(moderate_members=True)
-async def timeout(ctx, member: discord.Member, duration: str):
+async def timeout(
+    ctx,
+    member: discord.Member,
+    duration: str,
+    *,
+    reason="No reason provided"
+):
 
     try:
         unit = duration[-1]
@@ -57,16 +63,18 @@ async def timeout(ctx, member: discord.Member, duration: str):
             return
 
         await member.edit(
-            timed_out_until=discord.utils.utcnow() + delta
+            timed_out_until=discord.utils.utcnow() + delta,
+            reason=reason
         )
 
         await ctx.send(
-            f"{member.mention} has been timed out for {duration}."
+            f"{member.mention} has been timed out for {duration}.\n"
+            f"Reason: {reason}"
         )
 
     except:
         await ctx.send(
-            "Invalid format. Example: .to @user 10m"
+            "Invalid format. Example: .to @user 10m spamming"
         )
 
 @bot.command(name="um")
