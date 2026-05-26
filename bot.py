@@ -13,6 +13,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
+@bot.command(name="give_role")
 @bot.command()
 @commands.has_permissions(manage_roles=True)
 async def giverole(ctx, member: discord.Member, *, role: discord.Role):
@@ -23,6 +24,7 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
         f"Gave {role} to {member.mention}"
     )
 
+@bot.command(name="remove_role")
 @bot.command()
 @commands.has_permissions(manage_roles=True)
 async def removerole(ctx, member: discord.Member, *, role: discord.Role):
@@ -33,6 +35,7 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
         f"Removed {role} from {member.mention}"
     )
 
+@bot.command(name="to")
 @bot.command()
 @commands.has_permissions(moderate_members=True)
 async def timeout(ctx, member: discord.Member, duration: str):
@@ -69,6 +72,7 @@ async def timeout(ctx, member: discord.Member, duration: str):
             "Invalid format. Example: !timeout @user 10m"
         )
 
+@bot.command(name="um")
 @bot.command()
 @commands.has_permissions(moderate_members=True)
 async def untimeout(ctx, member: discord.Member):
