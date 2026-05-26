@@ -13,6 +13,16 @@ bot = commands.Bot(command_prefix=".", intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
+@bot.event
+async def on_member_join(member):
+
+    role = discord.utils.get(member.guild.roles, name="Follower")
+
+    if role is not None:
+        await member.add_roles(role)
+
+        print(f"Gave Member role to {member}")
+
 @bot.command(name="give_role")
 @commands.has_permissions(manage_roles=True)
 async def giverole(ctx, member: discord.Member, *, role: discord.Role):
