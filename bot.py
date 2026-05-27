@@ -16,12 +16,27 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
 
-    role = discord.utils.get(member.guild.roles, name="Follower")
+    role = discord.utils.get(
+        member.guild.roles,
+        name="Follower"
+    )
 
     if role is not None:
+
         await member.add_roles(role)
 
-        print(f"Gave Member role to {member}")
+        embed = discord.Embed(
+            description=(
+                f"✅ Gave Follower role to "
+                f"{member.mention} ({member})"
+            ),
+            color=discord.Color.green()
+        )
+
+        channel = member.guild.system_channel
+
+        if channel is not None:
+            await channel.send(embed=embed)
 
 @bot.command(name="give_role")
 @commands.has_permissions(manage_roles=True)
@@ -29,9 +44,15 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 
     await member.add_roles(role)
 
-    await ctx.send(
-        f"Gave {role} to {member.mention}"
+    embed = discord.Embed(
+        description=(
+            f"✅ Gave {role.mention} to "
+            f"{member.mention} ({member})"
+        ),
+        color=discord.Color.green()
     )
+
+    await ctx.send(embed=embed)
 
 @bot.command(name="remove_role")
 @commands.has_permissions(manage_roles=True)
@@ -39,9 +60,15 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
 
     await member.remove_roles(role)
 
-    await ctx.send(
-        f"Removed {role} from {member.mention}"
+    embed = discord.Embed(
+        description=(
+            f"✅ Removed {role.mention} from "
+            f"{member.mention} ({member})"
+        ),
+        color=discord.Color.red()
     )
+
+    await ctx.send(embed=embed)
 
 @bot.command(name="to")
 @commands.has_permissions(moderate_members=True)
@@ -54,6 +81,7 @@ async def timeout(
 ):
 
     try:
+
         unit = duration[-1]
         amount = int(duration[:-1])
 
@@ -71,7 +99,7 @@ async def timeout(
 
         else:
             await ctx.send(
-                "Use s (seconds), m (minutes), h (hours), or d (days)."
+                "Use s, m, h, or d."
             )
             return
 
@@ -80,15 +108,28 @@ async def timeout(
             reason=reason
         )
 
-        await ctx.send(
-            f"{member.mention} has been timed out for {duration}.\n"
-            f"Reason: {reason}"
+        embed = discord.Embed(
+            description=(
+                f"✅ Timed out {member.mention} "
+                f"({member}) until in {duration}.\n"
+                f"|| Reason: {reason}"
+            ),
+            color=discord.Color.green()
         )
 
+        await ctx.send(embed=embed)
+
     except:
-        await ctx.send(
-            "Invalid format. Example: .to @user 5h spamming"
+
+        error_embed = discord.Embed(
+            description=(
+                "❌ Invalid format.\n"
+                "Example: `.to @user 5h spamming`"
+            ),
+            color=discord.Color.red()
         )
+
+        await ctx.send(embed=error_embed)
 
 @bot.command(name="um")
 @commands.has_permissions(moderate_members=True)
@@ -98,9 +139,15 @@ async def untimeout(ctx, member: discord.Member):
         timed_out_until=None
     )
 
-    await ctx.send(
-        f"Removed timeout from {member.mention}"
+    embed = discord.Embed(
+        description=(
+            f"✅ Removed timeout from "
+            f"{member.mention} ({member})"
+        ),
+        color=discord.Color.green()
     )
+
+    await ctx.send(embed=embed)
 
 TOKEN = os.getenv("TOKEN")
 
