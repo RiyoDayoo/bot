@@ -30,7 +30,7 @@ async def on_member_join(member):
                 f"✅ Gave Follower role to "
                 f"{member.mention} ({member})"
             ),
-            color=discord.Color.green()
+            color=discord.Color(int("F594D7", 16))
         )
 
         channel = member.guild.system_channel
@@ -49,7 +49,7 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
             f"✅ Added {role.mention} to "
             f"{member.mention} ({member})"
         ),
-        color=discord.Color.green()
+        color=discord.Color(int("F594D7", 16))
     )
 
     await ctx.send(embed=embed)
@@ -65,7 +65,7 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
             f"✅ Removed {role.mention} from "
             f"{member.mention} ({member})"
         ),
-        color=discord.Color.red()
+        color=discord.Color(int("FF4F7B", 16))
     )
 
     await ctx.send(embed=embed)
@@ -114,7 +114,7 @@ async def timeout(
                 f"({member}) until in {duration}.\n"
                 f"|| Reason: {reason}"
             ),
-            color=discord.Color.pink()
+            color=discord.Color(int("F594D7", 16))
         )
 
         await ctx.send(embed=embed)
@@ -126,7 +126,7 @@ async def timeout(
                 "❌ Invalid format.\n"
                 "Example: `.to @user 5h spamming`"
             ),
-            color=discord.Color.red()
+            color=discord.Color(int("FF4F7B", 16))
         )
 
         await ctx.send(embed=error_embed)
@@ -144,7 +144,7 @@ async def untimeout(ctx, member: discord.Member):
             f"✅ Removed timeout from "
             f"{member.mention} ({member})"
         ),
-        color=discord.Color.green()
+        color=discord.Color(int("F594D7", 16))
     )
 
     await ctx.send(embed=embed)
