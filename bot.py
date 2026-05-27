@@ -83,6 +83,22 @@ async def nickname(
 
     old_nick = member.display_name
 
+    if new_nick.lower() == "reset":
+
+        await member.edit(nick=None)
+
+        embed = discord.Embed(
+            description=(
+                f"✅ Reset nickname for "
+                f"{member.mention}\n"
+                f"Old Nickname: {old_nick}"
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        await ctx.send(embed=embed)
+        return
+
     await member.edit(nick=new_nick)
 
     embed = discord.Embed(
@@ -93,6 +109,27 @@ async def nickname(
             f"New Nickname: {new_nick}"
         ),
         color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="ban")
+@commands.has_permissions(ban_members=True)
+async def ban(
+    ctx,
+    member: discord.Member,
+    *,
+    reason="No reason provided"
+):
+
+    await member.ban(reason=reason)
+
+    embed = discord.Embed(
+        description=(
+            f"🔨 Banned {member.mention} ({member})\n"
+            f"Reason: {reason}"
+        ),
+        color=discord.Color(int("FF4F7B", 16))
     )
 
     await ctx.send(embed=embed)
