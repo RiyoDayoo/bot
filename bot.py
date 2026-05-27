@@ -38,7 +38,7 @@ async def on_member_join(member):
         if channel is not None:
             await channel.send(embed=embed)
 
-@bot.command(name="give_role")
+@bot.command(name="add_role")
 @commands.has_permissions(manage_roles=True)
 async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 
@@ -46,7 +46,7 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 
     embed = discord.Embed(
         description=(
-            f"✅ Gave {role.mention} to "
+            f"✅ Added {role.mention} to "
             f"{member.mention} ({member})"
         ),
         color=discord.Color.green()
@@ -114,7 +114,7 @@ async def timeout(
                 f"({member}) until in {duration}.\n"
                 f"|| Reason: {reason}"
             ),
-            color=discord.Color.green()
+            color=discord.Color.pink()
         )
 
         await ctx.send(embed=embed)
