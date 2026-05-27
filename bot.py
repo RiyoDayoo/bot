@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 from datetime import timedelta
 
+warns = {}
+
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -38,7 +40,7 @@ async def on_member_join(member):
         if channel is not None:
             await channel.send(embed=embed)
 
-@bot.command(name="add_role")
+@bot.command(name="give_role")
 @commands.has_permissions(manage_roles=True)
 async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 
@@ -46,7 +48,7 @@ async def giverole(ctx, member: discord.Member, *, role: discord.Role):
 
     embed = discord.Embed(
         description=(
-            f"✅ Added {role.mention} to "
+            f"✅ Gave {role.mention} to "
             f"{member.mention} ({member})"
         ),
         color=discord.Color(int("F594D7", 16))
@@ -144,6 +146,65 @@ async def untimeout(ctx, member: discord.Member):
             f"✅ Removed timeout from "
             f"{member.mention} ({member})"
         ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="warn")
+@commands.has_permissions(moderate_members=True)
+async def warn(
+    ctx,
+    member: discord.Member,
+    *,
+    reason="No reason provided"
+):
+
+    user_id = str(member.id)
+
+    if user_id not in warns:
+        warns[user_id] = []
+
+    warns[user_id].append(reason)
+
+    warn_count = len(warns[user_id])
+
+    embed = discord.Embed(
+        description=(
+            f"⚠️ Warned {member.mention} ({member})\n"
+            f"Warns: {warn_count}\n"
+            f"Reason: {reason}"
+        ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="showwarns")
+async def show_warns(ctx, member: discord.Member):
+
+    user_id = str(member.id)
+
+    if user_id not in warns or len(warns[user_id]) == 0:
+
+        embed = discord.Embed(
+            description=(
+                f"✅ {member.mention} has no warns."
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        await ctx.send(embed=embed)
+        return
+
+    warn_list = ""
+
+    for i, reason in enumerate(warns[user_id], start=1):
+        warn_list += f"{i}. {reason}\n"
+
+    embed = discord.Embed(
+        title=f"Warns for {member}",
+        description=warn_list,
         color=discord.Color(int("F594D7", 16))
     )
 
