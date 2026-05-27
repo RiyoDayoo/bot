@@ -40,9 +40,9 @@ async def on_member_join(member):
         if channel is not None:
             await channel.send(embed=embed)
 
-@bot.command(name="give_role")
+@bot.command(name="add_role")
 @commands.has_permissions(manage_roles=True)
-async def giverole(ctx, member: discord.Member, *, role: discord.Role):
+async def addrole(ctx, member: discord.Member, *, role: discord.Role):
 
     await member.add_roles(role)
 
@@ -68,6 +68,31 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
             f"{member.mention} ({member})"
         ),
         color=discord.Color(int("FF4F7B", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="nick")
+@commands.has_permissions(manage_nicknames=True)
+async def nickname(
+    ctx,
+    member: discord.Member,
+    *,
+    new_nick
+):
+
+    old_nick = member.display_name
+
+    await member.edit(nick=new_nick)
+
+    embed = discord.Embed(
+        description=(
+            f"✅ Changed nickname for "
+            f"{member.mention}\n"
+            f"Old Nickname: {old_nick}\n"
+            f"New Nickname: {new_nick}"
+        ),
+        color=discord.Color(int("F594D7", 16))
     )
 
     await ctx.send(embed=embed)
