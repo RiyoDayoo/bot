@@ -39,7 +39,7 @@ async def on_member_join(member):
             description=(
                 f"🎀 Welcome to the server, "
                 f"{member.mention}!\n\n"
-                f"Pwease read the rules and enjoy your stay~!"
+                f"Please read the <#1500746326651047946> and enjoy your stay~!"
             ),
             color=discord.Color(int("F594D7", 16))
         )
