@@ -7,6 +7,9 @@ warns = {}
 
 afk_users = {}
 
+user_messages = {}
+user_levels = {}
+
 WELCOME_CHANNEL_ID = 1494196869834870916
 
 intents = discord.Intents.default()
@@ -39,7 +42,7 @@ async def on_member_join(member):
             description=(
                 f"🎀 Welcome to the server, "
                 f"{member.mention}!\n\n"
-                f"Please read the <#1500746326651047946> and enjoy your stay~!"
+                f"Please read the rules and enjoy your stay."
             ),
             color=discord.Color(int("F594D7", 16))
         )
@@ -75,6 +78,32 @@ async def on_message(message):
     if message.author.bot:
         return
 
+    user_id = str(message.author.id)
+
+    if user_id not in user_messages:
+        user_messages[user_id] = 0
+        user_levels[user_id] = 0
+
+    user_messages[user_id] += 1
+
+    if user_messages[user_id] >= 100:
+
+        user_messages[user_id] = 0
+        user_levels[user_id] += 1
+
+        level = user_levels[user_id]
+
+        embed = discord.Embed(
+            description=(
+                f"🎉 {message.author.mention} "
+                f"leveled up!\n"
+                f"New Level: {level}"
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        await message.channel.send(embed=embed)
+
     if message.author.id in afk_users:
 
         del afk_users[message.author.id]
@@ -106,6 +135,32 @@ async def on_message(message):
             await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
+
+@bot.command(name="level")
+async def level(ctx, member: discord.Member = None):
+
+    if member is None:
+        member = ctx.author
+
+    user_id = str(member.id)
+
+    if user_id not in user_levels:
+        user_levels[user_id] = 0
+        user_messages[user_id] = 0
+
+    level_num = user_levels[user_id]
+    current_msgs = user_messages[user_id]
+
+    embed = discord.Embed(
+        title=f"{member}'s Level",
+        description=(
+            f"⭐ Level: {level_num}\n"
+            f"💬 Messages: {current_msgs}/100"
+        ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
 
 @bot.command(name="purge")
 @commands.has_permissions(manage_messages=True)
@@ -183,7 +238,6 @@ async def nickname(
         await ctx.send(embed=embed)
         return
 
-    # CHANGE NICKNAME
     await member.edit(nick=new_nick)
 
     embed = discord.Embed(
