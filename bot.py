@@ -5,6 +5,8 @@ from datetime import timedelta
 
 warns = {}
 
+afk_users = {}
+
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -39,6 +41,59 @@ async def on_member_join(member):
 
         if channel is not None:
             await channel.send(embed=embed)
+
+@bot.command(name="afk")
+async def afk(ctx, *, reason="AFK"):
+
+    afk_users[ctx.author.id] = reason
+
+    embed = discord.Embed(
+        description=(
+            f"💤 {ctx.author.mention} is now AFK.\n"
+            f"Reason: {reason}"
+        ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.event
+async def on_message(message):
+
+    if message.author.bot:
+        return
+
+    if message.author.id in afk_users:
+
+        del afk_users[message.author.id]
+
+        embed = discord.Embed(
+            description=(
+                f"✅ Welcome back {message.author.mention}, "
+                f"your AFK status was removed."
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        await message.channel.send(embed=embed)
+
+    for user in message.mentions:
+
+        if user.id in afk_users:
+
+            reason = afk_users[user.id]
+
+            embed = discord.Embed(
+                description=(
+                    f"💤 {user.mention} is AFK.\n"
+                    f"Reason: {reason}"
+                ),
+                color=discord.Color(int("F594D7", 16))
+            )
+
+            await message.channel.send(embed=embed)
+
+    await bot.process_commands(message)
 
 @bot.command(name="add_role")
 @commands.has_permissions(manage_roles=True)
