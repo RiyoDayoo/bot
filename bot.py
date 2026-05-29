@@ -7,6 +7,8 @@ warns = {}
 
 afk_users = {}
 
+WELCOME_CHANNEL_ID = 1494196869834870916
+
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -26,21 +28,31 @@ async def on_member_join(member):
     )
 
     if role is not None:
-
         await member.add_roles(role)
 
+    channel = bot.get_channel(WELCOME_CHANNEL_ID)
+
+    if channel is not None:
+
         embed = discord.Embed(
+            title="Welcome!",
             description=(
-                f"✅ Gave Follower role to "
-                f"{member.mention} ({member})"
+                f"🎀 Welcome to the server, "
+                f"{member.mention}!\n\n"
+                f"Pwease read the rules and enjoy your stay~!"
             ),
             color=discord.Color(int("F594D7", 16))
         )
 
-        channel = member.guild.system_channel
+        embed.set_thumbnail(
+            url=member.display_avatar.url
+        )
 
-        if channel is not None:
-            await channel.send(embed=embed)
+        embed.set_footer(
+            text=f"Member #{member.guild.member_count}"
+        )
+
+        await channel.send(embed=embed)
 
 @bot.command(name="afk")
 async def afk(ctx, *, reason="AFK"):
@@ -171,6 +183,7 @@ async def nickname(
         await ctx.send(embed=embed)
         return
 
+    # CHANGE NICKNAME
     await member.edit(nick=new_nick)
 
     embed = discord.Embed(
