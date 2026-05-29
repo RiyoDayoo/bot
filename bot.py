@@ -1,30 +1,30 @@
 import os
-import json
+import sqlite3
 import discord
 from discord.ext import commands
-from datetime import timedelta
 
-def load_data(filename):
+conn = sqlite3.connect("database.db")
 
-    try:
-        with open(filename, "r") as f:
-            return json.load(f)
+cursor = conn.cursor()
 
-    except:
-        return {}
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS warns (
+    user_id TEXT,
+    reason TEXT
+)
+""")
 
-def save_data(filename, data):
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS levels (
+    user_id TEXT PRIMARY KEY,
+    level INTEGER,
+    messages INTEGER
+)
+""")
 
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
-
-warns = load_data("warns.json")
+conn.commit()
 
 afk_users = {}
-
-user_messages = load_data("messages.json")
-
-user_levels = load_data("levels.json")
 
 ROLE_MESSAGE_ID = None
 
@@ -79,7 +79,8 @@ async def on_member_join(member):
         embed = discord.Embed(
             title="Welcome!",
             description=(
-                f"🎀 Welcome {member.mention}!\n"
+                f"🎀 Welcome "
+                f"{member.mention}!\n"
                 f"Please read the <#1500746326651047946> and enjoy your stay~!"
             ),
             color=discord.Color(
@@ -243,30 +244,42 @@ async def on_message(message):
 
     user_id = str(message.author.id)
 
-    if user_id not in user_messages:
-
-        user_messages[user_id] = 0
-        user_levels[user_id] = 0
-
-    user_messages[user_id] += 1
-
-    save_data(
-        "messages.json",
-        user_messages
+    cursor.execute(
+        """
+        SELECT level, messages
+        FROM levels
+        WHERE user_id = ?
+        """,
+        (user_id,)
     )
 
-    if user_messages[user_id] >= 100:
+    data = cursor.fetchone()
 
-        user_messages[user_id] = 0
+    if data is None:
 
-        user_levels[user_id] += 1
+        level = 0
+        messages = 0
 
-        save_data(
-            "levels.json",
-            user_levels
+        cursor.execute(
+            """
+            INSERT INTO levels
+            VALUES (?, ?, ?)
+            """,
+            (user_id, level, messages)
         )
 
-        level = user_levels[user_id]
+        conn.commit()
+
+    else:
+
+        level, messages = data
+
+    messages += 1
+
+    if messages >= 100:
+
+        messages = 0
+        level += 1
 
         embed = discord.Embed(
             description=(
@@ -282,6 +295,17 @@ async def on_message(message):
         await message.channel.send(
             embed=embed
         )
+
+    cursor.execute(
+        """
+        UPDATE levels
+        SET level = ?, messages = ?
+        WHERE user_id = ?
+        """,
+        (level, messages, user_id)
+    )
+
+    conn.commit()
 
     if message.author.id in afk_users:
 
@@ -339,14 +363,25 @@ async def level(
 
     user_id = str(member.id)
 
-    if user_id not in user_levels:
+    cursor.execute(
+        """
+        SELECT level, messages
+        FROM levels
+        WHERE user_id = ?
+        """,
+        (user_id,)
+    )
 
-        user_levels[user_id] = 0
-        user_messages[user_id] = 0
+    data = cursor.fetchone()
 
-    level_num = user_levels[user_id]
+    if data is None:
 
-    current_msgs = user_messages[user_id]
+        level_num = 0
+        current_msgs = 0
+
+    else:
+
+        level_num, current_msgs = data
 
     embed = discord.Embed(
         title=f"{member}'s Level",
@@ -375,17 +410,26 @@ async def warn(
 
     user_id = str(member.id)
 
-    if user_id not in warns:
-        warns[user_id] = []
-
-    warns[user_id].append(reason)
-
-    save_data(
-        "warns.json",
-        warns
+    cursor.execute(
+        """
+        INSERT INTO warns
+        VALUES (?, ?)
+        """,
+        (user_id, reason)
     )
 
-    warn_count = len(warns[user_id])
+    conn.commit()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM warns
+        WHERE user_id = ?
+        """,
+        (user_id,)
+    )
+
+    warn_count = cursor.fetchone()[0]
 
     embed = discord.Embed(
         description=(
@@ -409,7 +453,18 @@ async def show_warns(
 
     user_id = str(member.id)
 
-    if user_id not in warns:
+    cursor.execute(
+        """
+        SELECT reason
+        FROM warns
+        WHERE user_id = ?
+        """,
+        (user_id,)
+    )
+
+    data = cursor.fetchall()
+
+    if len(data) == 0:
 
         embed = discord.Embed(
             description=(
@@ -427,13 +482,13 @@ async def show_warns(
 
     warn_text = ""
 
-    for i, reason in enumerate(
-        warns[user_id],
+    for i, warn in enumerate(
+        data,
         start=1
     ):
 
         warn_text += (
-            f"{i}. {reason}\n"
+            f"{i}. {warn[0]}\n"
         )
 
     embed = discord.Embed(
