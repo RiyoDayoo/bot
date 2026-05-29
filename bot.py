@@ -13,14 +13,14 @@ user_levels = {}
 ROLE_MESSAGE_ID = None
 
 reaction_roles = {
-    "🔴": "Red",
-    "🟡": "Yellow",
-    "🔵": "Blue",
-    "🟢": "Green",
-    "🟣": "Purple",
-    "⚫": "Black",
-    "⚪": "White",
-    "🟠": "Orange",
+    "❤️": "Red",
+    "💛": "Yellow",
+    "💙": "Blue",
+    "💚": "Green",
+    "💜": "Purple",
+    "🖤": "Black",
+    "🤍": "White",
+    "🧡": "Orange",
     "🩷": "Pink"
 }
 
@@ -82,14 +82,14 @@ async def setup_roles(ctx):
         title="Choose Your Color Role",
         description=(
             "React below to get a color role!\n\n"
-            "🔴 = Red\n"
-            "🟡 = Yellow\n"
-            "🔵 = Blue\n"
-            "🟢 = Green\n"
-            "🟣 = Purple\n"
-            "⚫ = Black\n"
-            "⚪ = White\n"
-            "🟠 = Orange\n"
+            "❤️ = Red\n"
+            "💛 = Yellow\n"
+            "💙 = Blue\n"
+            "💚 = Green\n"
+            "💜 = Purple\n"
+            "🖤 = Black\n"
+            "🤍 = White\n"
+            "🧡 = Orange\n"
             "🩷 = Pink"
         ),
         color=discord.Color(int("F594D7", 16))
@@ -101,14 +101,14 @@ async def setup_roles(ctx):
     ROLE_MESSAGE_ID = msg.id
 
     reactions = [
-        "🔴",
-        "🟡",
-        "🔵",
-        "🟢",
-        "🟣",
-        "⚫",
-        "⚪",
-        "🟠",
+        "❤️",
+        "💛",
+        "💙",
+        "💚",
+        "💜",
+        "🖤",
+        "🤍",
+        "🧡",
         "🩷"
     ]
 
@@ -206,7 +206,7 @@ async def on_message(message):
 
     user_messages[user_id] += 1
 
-    if user_messages[user_id] >= 1:
+    if user_messages[user_id] >= 100:
 
         user_messages[user_id] = 0
         user_levels[user_id] += 1
