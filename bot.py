@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 from datetime import timedelta
@@ -207,8 +208,8 @@ async def timeout(
         embed = discord.Embed(
             description=(
                 f"✅ Timed out {member.mention} "
-                f"({member}) until in {duration}.\n"
-                f"|| Reason: {reason}"
+                f"({member}) for {duration}.\n"
+                f"Reason: {reason}"
             ),
             color=discord.Color(int("F594D7", 16))
         )
@@ -274,7 +275,7 @@ async def warn(
 
     await ctx.send(embed=embed)
 
-@bot.command(name="showwarns")
+@bot.command(name="warns")
 async def show_warns(ctx, member: discord.Member):
 
     user_id = str(member.id)
