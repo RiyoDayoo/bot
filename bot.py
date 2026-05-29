@@ -80,7 +80,7 @@ async def on_member_join(member):
             title="Welcome!",
             description=(
                 f"🎀 Welcome {member.mention}!\n"
-                f"Enjoy your stay."
+                f"Please read the <#1500746326651047946> and enjoy your stay~!"
             ),
             color=discord.Color(
                 int("F594D7", 16)
@@ -401,7 +401,7 @@ async def warn(
 
     await ctx.send(embed=embed)
 
-@bot.command(name="warns")
+@bot.command(name="showwarns")
 async def show_warns(
     ctx,
     member: discord.Member
