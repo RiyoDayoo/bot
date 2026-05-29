@@ -1,4 +1,3 @@
-import os
 import discord
 from discord.ext import commands
 from datetime import timedelta
@@ -133,6 +132,39 @@ async def ban(
     )
 
     await ctx.send(embed=embed)
+
+@bot.command(name="unban")
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, *, member_name):
+
+    banned_users = [entry async for entry in ctx.guild.bans()]
+
+    for ban_entry in banned_users:
+
+        user = ban_entry.user
+
+        if str(user) == member_name:
+
+            await ctx.guild.unban(user)
+
+            embed = discord.Embed(
+                description=(
+                    f"✅ Unbanned {user}"
+                ),
+                color=discord.Color(int("F594D7", 16))
+            )
+
+            await ctx.send(embed=embed)
+            return
+
+    error_embed = discord.Embed(
+        description=(
+            "❌ User not found in ban list."
+        ),
+        color=discord.Color(int("FF4F7B", 16))
+    )
+
+    await ctx.send(embed=error_embed)
 
 @bot.command(name="to")
 @commands.has_permissions(moderate_members=True)
