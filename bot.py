@@ -528,6 +528,52 @@ async def purge(
 
     await msg.delete(delay=3)
 
+    @bot.command(name="add_role")
+@commands.has_permissions(manage_roles=True)
+async def add_role(
+    ctx,
+    member: discord.Member,
+    *,
+    role: discord.Role
+):
+
+    await member.add_roles(role)
+
+    embed = discord.Embed(
+        description=(
+            f"✅ Added {role.mention} to "
+            f"{member.mention}"
+        ),
+        color=discord.Color(
+            int("F594D7", 16)
+        )
+    )
+
+    await ctx.send(embed=embed)
+
+    @bot.command(name="remove_role")
+@commands.has_permissions(manage_roles=True)
+async def remove_role(
+    ctx,
+    member: discord.Member,
+    *,
+    role: discord.Role
+):
+
+    await member.remove_roles(role)
+
+    embed = discord.Embed(
+        description=(
+            f"✅ Removed {role.mention} from "
+            f"{member.mention}"
+        ),
+        color=discord.Color(
+            int("F594D7", 16)
+        )
+    )
+
+    await ctx.send(embed=embed)
+
 TOKEN = os.getenv("TOKEN")
 
 bot.run(TOKEN)
