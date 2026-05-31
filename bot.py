@@ -42,6 +42,8 @@ reaction_roles = {
 
 WELCOME_CHANNEL_ID = 1494196869834870916
 
+MSG_LOG_CHANNEL_ID = 1510789707590668389
+
 intents = discord.Intents.default()
 
 intents.members = True
@@ -559,6 +561,51 @@ async def removerole(ctx, member: discord.Member, *, role: discord.Role):
     )
 
     await ctx.send(embed=embed)
+
+@bot.event
+async def on_message_delete(message):
+
+    if message.author.bot:
+        return
+
+    channel = bot.get_channel(MSG_LOG_CHANNEL_ID)
+
+    if channel is None:
+        return
+
+    content = message.content
+
+    if not content:
+        content = "*No text content (possibly an embed, attachment, or image)*"
+
+    embed = discord.Embed(
+        title="🗑️ Message Deleted",
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    embed.add_field(
+        name="Author",
+        value=f"{message.author.mention} ({message.author})",
+        inline=False
+    )
+
+    embed.add_field(
+        name="Channel",
+        value=message.channel.mention,
+        inline=False
+    )
+
+    embed.add_field(
+        name="Content",
+        value=content[:1024],
+        inline=False
+    )
+
+    embed.set_thumbnail(
+        url=message.author.display_avatar.url
+    )
+
+    await channel.send(embed=embed)
 
 TOKEN = os.getenv("TOKEN")
 
