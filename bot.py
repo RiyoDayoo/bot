@@ -598,10 +598,23 @@ async def timeout(
             delta = timedelta(days=amount)
 
         else:
-            await ctx.send(
-                "Use s, m, h, or d."
-            )
+            await ctx.send("Use s, m, h, or d.")
             return
+
+        dm_embed = discord.Embed(
+            title="You were timed out",
+            description=(
+                f"Server: {ctx.guild.name}\n"
+                f"Duration: {duration}\n"
+                f"Reason: {reason}"
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        try:
+            await member.send(embed=dm_embed)
+        except discord.Forbidden:
+            pass
 
         await member.edit(
             timed_out_until=discord.utils.utcnow() + delta,
@@ -610,8 +623,8 @@ async def timeout(
 
         embed = discord.Embed(
             description=(
-                f"✅ Timed out {member.mention} "
-                f"({member}) for {duration}.\n"
+                f"⏳ Timed out {member.mention}\n"
+                f"Duration: {duration}\n"
                 f"Reason: {reason}"
             ),
             color=discord.Color(int("F594D7", 16))
@@ -619,30 +632,34 @@ async def timeout(
 
         await ctx.send(embed=embed)
 
-    except:
+    except ValueError:
 
-        error_embed = discord.Embed(
-            description=(
-                "❌ Invalid format.\n"
-                "Example: `.to @user 5h spamming`"
-            ),
-            color=discord.Color(int("FF4F7B", 16))
+        await ctx.send(
+            "❌ Invalid format. Example: `.to @user 5h spamming`"
         )
-
-        await ctx.send(embed=error_embed)
 
 @bot.command(name="um")
 @commands.has_permissions(moderate_members=True)
-async def untimeout(ctx, member: discord.Member):
+async def untimeout(
+    ctx,
+    member: discord.Member
+):
 
     await member.edit(
         timed_out_until=None
     )
 
+    try:
+        await member.send(
+            f"You have been un-timed-out in **{ctx.guild.name}**."
+        )
+    except:
+        pass
+
     embed = discord.Embed(
         description=(
             f"✅ Removed timeout from "
-            f"{member.mention} ({member})"
+            f"{member.mention}"
         ),
         color=discord.Color(int("F594D7", 16))
     )
