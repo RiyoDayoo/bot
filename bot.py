@@ -2,6 +2,7 @@ import os
 import sqlite3
 import discord
 from discord.ext import commands
+from datetime import timedelta
 
 conn = sqlite3.connect("/data/database.db")
 
@@ -499,6 +500,151 @@ async def show_warns(
         color=discord.Color(
             int("F594D7", 16)
         )
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="ban")
+@commands.has_permissions(ban_members=True)
+async def ban(
+    ctx,
+    member: discord.Member,
+    *,
+    reason="No reason provided"
+):
+
+    dm_embed = discord.Embed(
+        title="You were banned",
+        description=(
+            f"Server: {ctx.guild.name}\n"
+            f"Reason: {reason}"
+        ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    try:
+        await member.send(embed=dm_embed)
+    except discord.Forbidden:
+        pass
+
+    await member.ban(reason=reason)
+
+    embed = discord.Embed(
+        description=(
+            f"🔨 Banned {member.mention}\n"
+            f"Reason: {reason}"
+        ),
+        color=discord.Color(int("F594D7", 16))
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(name="unban")
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, *, member_name):
+
+    banned_users = [entry async for entry in ctx.guild.bans()]
+
+    for ban_entry in banned_users:
+
+        user = ban_entry.user
+
+        if str(user) == member_name:
+
+            await ctx.guild.unban(user)
+
+            try:
+                await user.send(
+                    f"You have been unbanned from **{ctx.guild.name}**."
+                )
+            except:
+                pass
+
+            embed = discord.Embed(
+                description=f"✅ Unbanned {user}",
+                color=discord.Color(int("F594D7", 16))
+            )
+
+            await ctx.send(embed=embed)
+            return
+
+    await ctx.send("❌ User not found in ban list.")
+
+@bot.command(name="to")
+@commands.has_permissions(moderate_members=True)
+async def timeout(
+    ctx,
+    member: discord.Member,
+    duration: str,
+    *,
+    reason="No reason provided"
+):
+
+    try:
+
+        unit = duration[-1]
+        amount = int(duration[:-1])
+
+        if unit == "s":
+            delta = timedelta(seconds=amount)
+
+        elif unit == "m":
+            delta = timedelta(minutes=amount)
+
+        elif unit == "h":
+            delta = timedelta(hours=amount)
+
+        elif unit == "d":
+            delta = timedelta(days=amount)
+
+        else:
+            await ctx.send(
+                "Use s, m, h, or d."
+            )
+            return
+
+        await member.edit(
+            timed_out_until=discord.utils.utcnow() + delta,
+            reason=reason
+        )
+
+        embed = discord.Embed(
+            description=(
+                f"✅ Timed out {member.mention} "
+                f"({member}) for {duration}.\n"
+                f"Reason: {reason}"
+            ),
+            color=discord.Color(int("F594D7", 16))
+        )
+
+        await ctx.send(embed=embed)
+
+    except:
+
+        error_embed = discord.Embed(
+            description=(
+                "❌ Invalid format.\n"
+                "Example: `.to @user 5h spamming`"
+            ),
+            color=discord.Color(int("FF4F7B", 16))
+        )
+
+        await ctx.send(embed=error_embed)
+
+@bot.command(name="um")
+@commands.has_permissions(moderate_members=True)
+async def untimeout(ctx, member: discord.Member):
+
+    await member.edit(
+        timed_out_until=None
+    )
+
+    embed = discord.Embed(
+        description=(
+            f"✅ Removed timeout from "
+            f"{member.mention} ({member})"
+        ),
+        color=discord.Color(int("F594D7", 16))
     )
 
     await ctx.send(embed=embed)
